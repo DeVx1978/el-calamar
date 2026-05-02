@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+/* 0. TIPOGRAFÍA PERSONALIZADA: SQUID GAME */
+@font-face {
+  font-family: 'SquidGame';
+  src: url('/fonts/GameOfSquids.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 1. BLINDAJE TOTAL ANTI-AZUL (Prioridad de Sistema) */
+a, a:visited, a:hover, a:active {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+/* 2. ADN VISUAL DEL PROYECTO */
+body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* 3. MOTOR DE FONDO DINÁMICO */
+.bg-elite {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* RUTA CORREGIDA SEGÚN SU ESTRUCTURA EN CAPTURA 217 */
+  background-image: url('/img/lobby.jpg'); 
+  background-size: cover;
+  background-position: center;
+  z-index: -2;
+  opacity: 0.45; /* Equilibrio perfecto de visibilidad */
+}
+
+.overlay-elite {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Degradado para dar profundidad PS5 */
+  background: radial-gradient(circle, transparent 10%, #000000 95%);
+  z-index: -1;
+}
+
+/* 4. EFECTOS DE INTERFAZ DEGRADADA (EL CALAMAR) */
+.state-interference {
+  filter: contrast(1.1) brightness(0.95);
+  animation: subtle-shake 5s infinite;
+}
+
+.state-critical {
+  filter: grayscale(0.4) sepia(0.2) contrast(1.3);
+  position: relative;
+}
+
+.state-critical::after {
+  content: "ALERTA: VECTORES INESTABLES";
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  font-size: 10px;
+  color: #FF004D;
+  z-index: 1001;
+  animation: pulse-fast 0.5s infinite;
+}
+
+.state-coma {
+  filter: grayscale(1) invert(0.9) blur(2px);
+  pointer-events: none; /* Bloqueo de interacción total */
+  user-select: none;
+}
+
+@keyframes subtle-shake {
+  0%, 100% { transform: translate(0,0); }
+  25% { transform: translate(1px, -1px); }
+  75% { transform: translate(-1px, 1px); }
+}
+
+@keyframes pulse-fast {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

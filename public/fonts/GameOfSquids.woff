@@ -1,0 +1,94 @@
+"use client";
+
+import React, { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { ChevronLeft, Zap, Heart, Wallet } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+export default function ArenaDetallePage() {
+  const params = useParams();
+  const router = useRouter();
+  
+  // Estados para almacenar la información de la base de datos
+  const [match, setMatch] = useState<any>(null);
+  const [config, setConfig] = useState({ name: 'CARGANDO SECTOR...', color: '#00C853' });
+  const [loading, setLoading] = useState(true);
+  
+  // Extraemos el slug y el id de la URL
+  const slug = params?.slug;
+  const id = params?.id;
+
+  useEffect(() => {
+    const cargarDatosSeguros = async () => {
+      try {
+        setLoading(true);
+
+        // Intentamos obtener el torneo usando el slug de la URL
+        const { data: torneo } = await supabase
+          .from('tournaments')
+          . some-select-placeholder
+          .eq('slug', slug)
+          .maybeSingle();
+
+        if (torneo) {
+          setConfig({
+            name: torneo.name,
+            color: torneo.accent_color || '#00C853'
+          });
+        } else {
+          // Si el slug no existe (como el error 404 de tu terminal),
+          // usamos datos de emergencia para no romper la UI
+          setConfig({ name: "SECTOR DESCONOCIDO", color: "#555" });
+        }
+
+        // Cargamos los datos del partido
+        const { data: partido } = await supabase
+          .from('partidos')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (partido) setMatch(partido);
+
+      } catch (err) {
+        console.error("Fallo en la comunicación táctica:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug && id) cargarDatosSeguros();
+  }, [slug, id]);
+
+  if (loading) return <div className="loading-screen">SINCRONIZANDO...</div>;
+
+  return (
+    <main style={{ backgroundColor: '#000', minHeight: '100vh', color: '#fff' }}>
+      {/* Estilos dinámicos usando el color de acento del torneo */}
+      <header style={{ borderBottom: `1px solid ${config.color}`, padding: '20px' }}>
+        <button onClick={() => router.back()} style={{ color: config.color, background: 'none', border: 'none', cursor: 'pointer' }}>
+          <ChevronLeft /> VOLVER AL RADAR
+        </button>
+        <h1 style={{ fontFamily: 'SquidGame, sans-serif', color: config.color }}>
+          {config.name}
+        </h1>
+      </header>
+
+      <section style={{ padding: '40px' }}>
+        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px', border: `1px solid ${config.color}33` }}>
+          <h2>{match?.home_team || 'EQUIPO LOCAL'} VS {match?.away_team || 'EQUIPO VISITANTE'}</h2>
+          <p>ESTADO DEL SECTOR: <span style={{ color: config.color }}>OPERATIVO</span></p>
+        </div>
+      </section>
+
+      <style jsx global>{`
+        @font-face {
+          font-family: 'SquidGame';
+          src: url('/fonts/GameOfSquids.woff') format('woff');
+          font-weight: normal;
+          font-style: normal;
+        }
+      `}</style>
+    </main>
+  );
+}
