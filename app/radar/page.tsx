@@ -30,44 +30,37 @@ export default function RadarLanding() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [tournaments, setTournaments] = useState<any[]>([]);
   const [isScanning, setIsScanning] = useState(true);
-  // 🛰️ DETECCIÓN, CREACIÓN Y LOG DE RECLUTA
+  // 🛰️ 1. VARIABLES DEL EXPEDIENTE
+  const [profileData, setProfileData] = useState({ 
+    name: '---', 
+    country: 'DESCONOCIDO', 
+    code: 'CQ-000000' 
+  });
+
+  // 🛰️ 2. FUNCIÓN DE ESCANEO
   useEffect(() => {
-  const checkUser = async () => {
-    // 1. Obtenemos el usuario de forma más segura
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('lives, full_name, country, player_code')
+          .eq('id', user.id)
+          .maybeSingle();
 
-    if (authError || !user) {
-      console.log("Error de Auth o no hay usuario:", authError);
-      setUserId(null);
-      return;
-    }
-
-    // 2. Aquí imprimimos el ID real que detecta el sistema (para ver si es B o C)
-    console.log("ID DETECTADO POR LOGIN:", user.id);
-    setUserId(user.id);
-
-    // 3. Buscamos las vidas con el ID exacto que nos dio el login
-    const { data: profile, error: dbError } = await supabase
-      .from('profiles')
-      .select('lives')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (dbError) {
-      console.log("Error al buscar vidas:", dbError.message);
-    }
-
-    if (profile) {
-      console.log("Vidas encontradas:", profile.lives);
-      setUserLives(profile.lives);
-    } else {
-      console.log("No se encontró perfil para el ID:", user.id);
-      setUserLives(0); // O el valor por defecto
-    }
-  };
-
-  checkUser();
-}, []);
+        if (profile) {
+          setUserLives(profile.lives);
+          setProfileData({
+            name: profile.full_name || 'RECLUTA',
+            country: profile.country || 'DESCONOCIDO',
+            code: profile.player_code || 'CQ-000'
+          });
+        }
+      }
+    };
+    checkUser();
+  }, []);
 
   // 📡 EFECTO: SUMAR DATOS REALES A LA SIMULACIÓN
   useEffect(() => {
@@ -424,6 +417,28 @@ export default function RadarLanding() {
           .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
           .sectors-grid { grid-template-columns: 1fr; }
         }
+          /* 🪪 ESTILOS DE LA TARJETA DE IDENTIDAD */
+        .id-card-tactical {
+          position: fixed; right: 40px; top: 250px; width: 300px;
+          background: linear-gradient(135deg, rgba(15,15,15,0.95) 0%, rgba(5,5,5,0.98) 100%);
+          border-left: 4px solid var(--red); padding: 25px; z-index: 100;
+          backdrop-filter: blur(20px); box-shadow: -15px 0 40px rgba(0,0,0,0.8);
+          border-radius: 0 8px 8px 0; font-family: var(--font-mono);
+        }
+        .barcode-container {
+          margin-top: 20px; padding: 10px; background: #fff;
+          display: flex; gap: 2px; height: 40px; align-items: flex-end;
+          filter: invert(1) brightness(1.5) contrast(1.2); opacity: 0.8;
+        }
+        .barcode-line { background: #000; width: 2px; }
+        .lives-container {
+          display: flex; gap: 8px; margin-top: 15px;
+        }
+        .heart-icon {
+          filter: drop-shadow(0 0 5px var(--red));
+          transition: all 0.4s ease;
+        }
+        .heart-off { opacity: 0.15; filter: grayscale(1); }
       `}} />
 
       <div className="live-feed">

@@ -27,7 +27,7 @@ const COUNTRIES = [
   { name: 'Otro',       code: '',     maxDigits: 15 },
 ];
 
-// ✅ Componente ojo que sigue el mouse — diseño intacto
+// ✅ Componente ojo que sigue al mouse — diseño intacto
 const TrackingEye = ({ show, onClick, mousePos }: {
   show: boolean;
   onClick: () => void;
@@ -111,33 +111,36 @@ export default function RegisterPortal() {
 
       if (error) throw error;
 
-      // ✅ PASO 2: Crear perfil en tabla profiles con saldo inicial
+      // 📝 PASO 2: Sincronización de la Bóveda (Corrección Milimétrica)
       if (data.user) {
+        // Generamos el código real estilo Calamar
         const playerCode = `CQ-${Math.floor(Math.random() * 900000) + 100000}`;
-        const { error: profileError } = await supabase.from('profiles').insert({
+        
+        // 🛡️ CAMBIAMOS .insert POR .upsert PARA EVITAR EL ERROR DE CLAVE DUPLICADA
+        const { error: profileError } = await supabase.from('profiles').upsert({
           id: data.user.id,
-          username: gamertag,
-          full_name: fullName,
+          username: gamertag,             // 👈 Se llena el alias
+          full_name: fullName,            // 👈 Se llenan nombres y apellidos
           email: email,
-          phone: `${selectedCountry.code}${phone}`,
-          country: selectedCountry.name,
-          role: 'player',
-          pitchx_balance: 0,
-          lives: 0,
+          phone: `${selectedCountry.code}${phone}`, // 👈 Se llena el teléfono
+          country: selectedCountry.name,  // 👈 Se llena el país
+          role: 'user',                   // Rango inicial recluta
+          pitchx_balance: 0,              // Saldo inicial
+          lives: 0,                       // Vidas iniciales
           status: 'VIVO',
           streak: 0,
           best_streak: 0,
           is_ghost: false,
-          player_code: playerCode,
+          player_code: playerCode,        // 🆔 El código que aparecerá en el expediente
         });
 
-        // Si la tabla no existe aún no bloqueamos el flujo
         if (profileError) {
-          console.warn('Perfil no creado aún (tabla pendiente):', profileError.message);
+          console.error('ERROR EN BÓVEDA:', profileError.message);
+          throw profileError;
         }
       }
 
-      setSystemMessage('CONTRATO FIRMADO. ACCESO CONCEDIDO.');
+      setSystemMessage('DATOS FIRMADOS. ACCESO CONCEDIDO.');
       setTimeout(() => router.push('/radar'), 2000);
     } catch (error: any) {
       setIsLoading(false);
@@ -158,7 +161,7 @@ export default function RegisterPortal() {
         .auth-bg {
           position: fixed; inset: 0; z-index: 0;
           background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.4) 0%, #000 100%), url('${IMAGEN_FONDO}');
-          background-size: cover; background-position: center; filter: brightness(0.4);
+          background-size: cover; background-position: center; filter: brightness(0.65);
         }
         .magenta-neon-grid {
           position: fixed; inset: 0; z-index: 1; pointer-events: none;
@@ -168,7 +171,7 @@ export default function RegisterPortal() {
         }
         .radar-vignette {
           position: fixed; inset: 0; z-index: 2; pointer-events: none;
-          background: radial-gradient(circle 450px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0,0,0,0.98) 100%);
+          background: radial-gradient(circle 450px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0,0,0,0.72) 100%);
         }
         .card-wrapper {
           position: relative; z-index: 10; width: 100%; max-width: 440px;
@@ -293,7 +296,7 @@ export default function RegisterPortal() {
               <User size={14} className="input-icon" />
               <input
                 className="elite-input"
-                placeholder="NOMBRES COMPLETOS"
+                placeholder="NOMBRES Y APELLIDOS"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
                 autoComplete="off"
@@ -305,7 +308,7 @@ export default function RegisterPortal() {
               <Target size={14} className="input-icon" />
               <input
                 className="elite-input"
-                placeholder="GAMERTAG / ALIAS"
+                placeholder="APODO / ALIAS"
                 value={gamertag}
                 onChange={e => setGamertag(e.target.value)}
                 autoComplete="off"
@@ -358,7 +361,7 @@ export default function RegisterPortal() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 className="elite-input"
-                placeholder="CREAR CLAVE"
+                placeholder="CREAR CONTRASEÑA"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 autoComplete="new-password"
@@ -372,7 +375,7 @@ export default function RegisterPortal() {
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 className="elite-input"
-                placeholder="CONFIRMAR CLAVE"
+                placeholder="CONFIRMAR CONTRASEÑA"
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 autoComplete="new-password"
@@ -392,7 +395,7 @@ export default function RegisterPortal() {
                 <div className="checkbox-box">
                   {acceptTerms && <Check size={12} color="#00C853" strokeWidth={4} />}
                 </div>
-                <span className="checkbox-label">ACEPTO LOS <span>PROTOCOLOS DE SUPERVIVENCIA</span></span>
+                <span className="checkbox-label">ACEPTO LOS <span>TERMINOS Y CONDICIONES</span></span>
               </label>
             </div>
 
@@ -417,7 +420,7 @@ export default function RegisterPortal() {
 
             <div className="mt-8 text-center">
               <button type="button" onClick={() => router.push('/login')} className="login-link-btn">
-                ¿YA ERES UN RECLUTA? INICIAR SESION
+                ¿YA TIENES UNA CUENTA? INICIAR SESION
               </button>
             </div>
 

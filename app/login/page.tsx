@@ -88,7 +88,7 @@ export default function LoginPortal() {
         .auth-bg {
           position: fixed; inset: 0; z-index: 0;
           background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.4) 0%, #000 100%), url('${IMAGEN_FONDO}');
-          background-size: cover; background-position: center; filter: brightness(0.4);
+          background-size: cover; background-position: center; filter: brightness(0.65);
         }
 
         .magenta-neon-grid {
@@ -100,7 +100,7 @@ export default function LoginPortal() {
 
         .radar-vignette {
           position: fixed; inset: 0; z-index: 2; pointer-events: none;
-          background: radial-gradient(circle 450px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0,0,0,0.98) 100%);
+          background: radial-gradient(circle 450px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0,0,0,0.75) 100%);
         }
 
         .card-wrapper {
